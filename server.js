@@ -91,32 +91,15 @@ app.use(helmet({
 // ========================
 // 3. CORS Configuration
 // ========================
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  'https://resumexpert-ai.vercel.app', // Placeholder for production
-  'http://localhost:5173',
-  'http://localhost:3000'
-].filter(Boolean);
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || "https://resumexpert-ai-frontend.vercel.app",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+};
 
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
-    
-    const isAllowed = allowedOrigins.some(allowed => 
-      origin === allowed || origin.startsWith(allowed)
-    );
-
-    if (isAllowed || process.env.NODE_ENV === 'development') {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 // ========================
 // 4. Request Parsing & Logging

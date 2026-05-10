@@ -101,6 +101,15 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
 
+// Supplemental CORS middleware to fix "silent CORS failure after preflight"
+app.use((req, res, next) => {
+  const origin = process.env.FRONTEND_URL || "https://resumexpert-ai-frontend.vercel.app";
+  res.header("Access-Control-Allow-Origin", origin);
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  next();
+});
+
 // ========================
 // 4. Request Parsing & Logging
 // ========================

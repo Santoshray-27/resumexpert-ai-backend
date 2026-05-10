@@ -89,24 +89,20 @@ app.use(helmet({
 }));
 
 // ========================
-// 3. CORS Configuration
+// 3. CORS Configuration (Robust & Unified)
 // ========================
-const corsOptions = {
-  origin: process.env.FRONTEND_URL || "https://resumexpert-ai-frontend.vercel.app",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
-};
+const allowedOrigin = process.env.FRONTEND_URL || "https://resumexpert-ai-frontend.vercel.app";
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
-
-// Supplemental CORS middleware to fix "silent CORS failure after preflight"
 app.use((req, res, next) => {
-  const origin = process.env.FRONTEND_URL || "https://resumexpert-ai-frontend.vercel.app";
-  res.header("Access-Control-Allow-Origin", origin);
+  res.header("Access-Control-Allow-Origin", allowedOrigin);
   res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Accept");
+  
+  // Handle preflight
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
   next();
 });
 
